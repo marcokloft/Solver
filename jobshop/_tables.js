@@ -18,32 +18,8 @@ var TableManipulator = (function () {
             var cell = headerRow.insertCell();
             cell.innerHTML = "x<sub>" + (i + 1) + "</sub>";
         }
-        headerRow.insertCell().innerHTML = "b";
     }
 
-    /**
-     *
-     * creates initial the row for the objective function for the matrix table
-     *
-     * @returns void
-     */
-    function createObjectiveFunction() {
-
-        var objectiveFunction = matrixTable.getElementsByTagName('tbody')[0]
-            .insertRow();
-        objectiveFunction.id = "objectiveFunction";
-        var lineHeading = objectiveFunction.insertCell();
-        lineHeading.innerHTML = headerMatrixObjectiveFunction;
-
-        for (var i = 0; i < numbOfVariables; i++) {
-            var tempCell = objectiveFunction.insertCell();
-            tempCell.appendChild(createInputElement());
-        }
-
-        var rightHand = objectiveFunction.insertCell();
-        rightHand.appendChild(createInputElement());
-
-    }
 
     /**
      * reset the two tables and set the default size of 2 variables & constraints
@@ -98,9 +74,6 @@ var TableManipulator = (function () {
 
         // createTBody() returns the existing <tbody> element
         var tBody = matrixTable.tBodies[0];
-        var objectiveFunction = document.getElementById("objectiveFunction");
-
-
 
         // insert a new row to the table body
         var matrixRow = matrixTable.tBodies[0].insertRow();
@@ -118,9 +91,6 @@ var TableManipulator = (function () {
             var tempCell = matrixRow.insertCell();
             tempCell.appendChild(createInputElement());
         }
-        // create and insert the rhs
-        var rightHand = matrixRow.insertCell();
-        rightHand.appendChild(createInputElement());
 
     }
 
@@ -149,45 +119,17 @@ var TableManipulator = (function () {
         // matrix header
         var headerRow = document.getElementById("matrixHeader");
 
-        var rhsColumn = [];
-        for (var i = 1; i < matrixTable.rows.length; i++) {
-            rhsColumn.push(matrixTable.rows[i].lastElementChild);
-        }
-
-        // delete the rhs label cell in the header row
-        headerRow.deleteCell(-1);
-
-        // add the new variable
+        // add the new variable to the header
         var cell = headerRow.insertCell();
         cell.innerHTML = "x<sub>" + numbOfVariables + "</sub>";
-
-        // and add again the label for the rhs
-        headerRow.insertCell().innerHTML = "b";
-
-        // objective function
-        var objectiveFunctionRow = document.getElementById("objectiveFunction");
-        objectiveFunctionRow.deleteCell(-1);
-
-        var objFuncCell = objectiveFunctionRow.insertCell();
-        objFuncCell.appendChild(createInputElement());
-
-        var rightHand = objectiveFunctionRow.insertCell();
-        rightHand.appendChild(createInputElement());
 
         // extend constraints row
         var constraintRows = document.getElementsByClassName("constraint");
         for (var j = 0; j < constraintRows.length; j++) {
 
-            // remove the right hand side
-            constraintRows[j].deleteCell(-1);
-
             // add the cell for the new variable
             var newCell = constraintRows[j].insertCell();
             newCell.appendChild(createInputElement());
-
-            // add the right hand side
-            var rhs = constraintRows[j].insertCell();
-            rhs.appendChild(createInputElement());
         }
 
         for (var k = 1; k < matrixTable.rows.length; k++) {
@@ -205,33 +147,13 @@ var TableManipulator = (function () {
     function removeVariable() {
         // tablaeu header
         var headerRow = document.getElementById("matrixHeader");
-        headerRow.deleteCell(-1); // one time for the "right hand side"
         headerRow.deleteCell(-1); // one time for the deleted variable
-
-        headerRow.insertCell().innerHTML = "b";
-
-        // objective function
-        var objectiveFunctionRow = document.getElementById("objectiveFunction");
-        objectiveFunctionRow.deleteCell(-1);
-        objectiveFunctionRow.deleteCell(-1);
-
-        var rightHand = objectiveFunctionRow.insertCell();
-        rightHand.appendChild(createInputElement());
 
         // constraints
         var constraintRows = document.getElementsByClassName("constraint");
         for (var i = 0; i < constraintRows.length; i++) {
-
-            // remove the right hand side
-            var valueOfRightHandSide = constraintRows[i].lastChild.lastChild.value;
-            constraintRows[i].deleteCell(-1);
-
             // remove the removed variable ;)
             constraintRows[i].deleteCell(-1);
-
-            // add the right hand side
-            var rhs = constraintRows[i].insertCell();
-            rhs.appendChild(createInputElement(valueOfRightHandSide));
         }
     }
 
@@ -270,7 +192,6 @@ var TableManipulator = (function () {
      *
      */
     return {
-        createObjectiveFunction: createObjectiveFunction,
         createMatrixHeader: createMatrixHeader,
         reset: reset,
 
