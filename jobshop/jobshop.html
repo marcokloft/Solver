@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jobshop.js"></script>
+    <script src="_tables.js"></script>
+    <script src="_eventhandler.js"></script>
+</head>
+<body>
+
+<section id="controls">
+    <label for="jobshop.numbOfVariables" th:text="#{jobshop.numberOfVariables}">Anzahl der Maschinen</label>
+    <input id="jobshop.numbOfVariables" name="jobshop.numbOfVariables" type="number" min="1" placeholder="Number of variables" value="2"/>
+    <button id="jobshop.incrementNumberOfVariables">↑</button>
+    <button id="jobshop.decrementNumberOfVariables">↓</button>
+
+    <label for="jobshop.numbOfConstraints" th:text="#{jobshop.numberOfConstraints}">Anzahl der Produkte</label>
+    <input id="jobshop.numbOfConstraints" name="jobshop.numbOfConstraints" type="number" min="1" placeholder="Number of constrains" value="2"/>
+    <button id="jobshop.incrementNumberOfConstraints">↑</button>
+    <button id="jobshop.decrementNumberOfConstraints">↓</button>
+
+    <button id="jobshop.reset" th:text="#{jobshop.resetButton}">Reset</button>
+    <button id="jobshop.solve" th:text="#{jobshop.solveButton}">Lösen</button>
+
+</section>
+
+<table id="jobshop.tableau">
+    <thead>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script th:inline="javascript">
+    init();
+</script>
+</body>
+</html>

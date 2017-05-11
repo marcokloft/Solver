@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="logic-new.js"></script>
+<style>
+table {
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+td {
+	width: 2em;
+	height: 2em;
+}
+
+/* disable the spinner of the number inputs*/
+#controls input[type=number]::-webkit-inner-spin-button, #controls input[type=number]::-webkit-outer-spin-button
+	{
+	-webkit-appearance: none;
+	margin: 0;
+}
+</style>
+</head>
+<body>
+	<section id="controls">
+		<label for="numbOfVariables" th:text="#{powerlp.numberOfVariables}">Anzahl der Variablen</label> <input
+			id="numbOfVariables" name="numbOfVariables" type="number" min="1"
+			placeholder="Number of variables" value="2" />
+		<button id="incrementNumberOfVariables">↑</button>
+		<button id="decrementNumberOfVariables">↓</button>
+
+		<label for="numbOfConstraintts" th:text="#{powerlp.numberOfConstraints}">Anzahl der Restriktionen</label> <input
+			id="numbOfConstraints" name="numbOfConstraints" type="number" min="1"
+			placeholder="Number of constrains" value="2" />
+		<button id="incrementNumberOfConstraints">↑</button>
+		<button id="decrementNumberOfConstraints">↓</button>
+
+		<label for="solverSelection" th:text="#{powerlp.solverSelection}">Auswahl Solver</label> <select
+			id="solverSelection" name="solverSelection">
+			<option value="lp_solve" selected>LP Solve</option>
+			<option value="glpk">GLPK</option>
+		</select>
+
+		<button id="reset" th:text="#{powerlp.resetButton}">Reset</button>
+		<button id="solve" th:text="#{powerlp.solveButton}">Lösen</button>
+
+	</section>
+
+	<table id="tableau">
+		<thead>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<table id="bounds">
+
+	</table>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+	// the strings to translate
+	var headerTableauTargetFunction = [[#{powerlp.headerTableauTargetFunction}]] || "Zielfunktion";
+	var headerTableauConstraintRow = [[#{powerlp.headerTableauConstraintRow}]] || "Restriktion";
+	var headerBoundsVariable = [[#{powerlp.headerBoundsVariable}]] || "Variablen";
+	var headerBoundsLower = [[#{powerlp.headerBoundsLower}]] || "Untergrenze";
+	var headerBoundsUpper = [[#{powerlp.headerBoundsUpper}]] || "Obergrenze";
+	var headerBoundsInteger = [[#{powerlp.headerBoundsInteger}]] || "Ganzzahl";
+
+	init();
+
+/*]]>*/
+</script>
+
+	<script th:src="@{/powerlp/logic-new.js}"></script>
+	<script th:src="@{/powerlp/tables.js}"></script>
+	<script th:src="@{/powerlp/eventhandler.js}"></script>	
+	<script th:src="@{/powerlp/ajax.js}"></script>
+
+</body>
+</html>
