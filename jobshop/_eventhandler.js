@@ -4,6 +4,9 @@
 
 var EventHandler = (function () {
 
+    var minNumbVariables = 2;
+    var minNumbConstraints = 2;
+
     function processUserInputVariables(event) {
         var timeoutVariablesInput = null;
         clearTimeout(timeoutVariablesInput);
@@ -30,7 +33,7 @@ var EventHandler = (function () {
                     }
                 } else if (diffVariables < 0) {
                     for (var j = diffVariables; j < 0; j++) {
-                        if (numbOfVariables < 2) {
+                        if (numbOfVariables < minNumbVariables) {
                             break;
                         }
                         numbOfVariables--;
@@ -76,7 +79,7 @@ var EventHandler = (function () {
                         }
                     } else if (diffVariables < 0) {
                         for (var j = diffVariables; j !== 0; j++) {
-                            if (numbOfConstraints < 1) {
+                            if (numbOfConstraints < minNumbConstraints) {
                                 break;
                             }
                             numbOfConstraints--;
@@ -120,7 +123,7 @@ var EventHandler = (function () {
             .addEventListener(
                 "click",
                 function () {
-                    if (numbOfVariables > 1) {
+                    if (numbOfVariables > minNumbVariables) {
                         numbOfVariables--;
                         document.getElementById("jobshop.numbOfVariables").value = numbOfVariables;
                         TableManipulator.removeVariable();
@@ -141,7 +144,7 @@ var EventHandler = (function () {
             .addEventListener(
                 "click",
                 function () {
-                    if (numbOfConstraints > 1) {
+                    if (numbOfConstraints > minNumbConstraints) {
                         numbOfConstraints--;
                         document.getElementById("jobshop.numbOfConstraints").value = numbOfConstraints;
                         TableManipulator.removeConstraint();

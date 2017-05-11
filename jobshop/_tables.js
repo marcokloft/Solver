@@ -132,9 +132,9 @@ var TableManipulator = (function () {
             newCell.appendChild(createInputElement());
         }
 
-        for (var k = 1; k < matrixTable.rows.length; k++) {
-            matrixTable.rows[k].replaceChild(rhsColumn[k - 1], matrixTable.rows[k].lastElementChild);
-        }
+        //for (var k = 1; k < matrixTable.rows.length; k++) {
+        //    matrixTable.rows[k].replaceChild(rhsColumn[k - 1], matrixTable.rows[k].lastElementChild);
+        //}
 
     }
 
