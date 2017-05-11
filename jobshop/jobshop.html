@@ -25,14 +25,26 @@
 
 </section>
 
-<table id="jobshop.tableau">
-    <thead>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<div id="table">
+    <form id="matrixForm" onsubmit="return false">
+        <table id="matrix">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <input type="submit" id="submitButton" style="display: none"/>
+
+    </form>
+</div>
 
 <script th:inline="javascript">
+
+    // the strings to translate
+    var headerMatrixObjectiveFunction = "Zielfunktion";
+    var headerMatrixConstraintRow = "Restriktion";
+
     init();
 </script>
 </body>

@@ -113,10 +113,7 @@ var TableManipulator = (function () {
             var tempCell = tableauRow.insertCell();
             tempCell.appendChild(createInputElement());
         }
-        var operator = tableauRow.insertCell();
-        operator.appendChild(createOperatorSelectorElement());
-        var rightHand = tableauRow.insertCell();
-        rightHand.appendChild(createInputElement());
+
     }
 
     /**
@@ -196,46 +193,7 @@ var TableManipulator = (function () {
         // tablaeu header
         var headerRow = document.getElementById("tableauHeader");
         headerRow.deleteCell(-1);
-        headerRow.deleteCell(-1); // two times for the "right hand side"
-        headerRow.deleteCell(-1); // one time for the deleted variable
 
-        headerRow.insertCell();
-        headerRow.insertCell().innerHTML = "b";
-
-        // target function
-        var targetFunctionRow = document.getElementById("targetFunction");
-        targetFunctionRow.deleteCell(-1);
-        targetFunctionRow.deleteCell(-1);
-        targetFunctionRow.deleteCell(-1);
-
-        targetFunctionRow.insertCell().innerHTML = "→";
-        var rhs = targetFunctionRow.insertCell();
-        rhs.appendChild(createMinMaxSelector());
-
-        // constraints
-        var constraintRows = document.getElementsByClassName("constraint");
-        for (var i = 0; i < constraintRows.length; i++) {
-
-            // remove the right hand side
-            var valueOfRightHandSide = constraintRows[i].lastChild.lastChild.value;
-            constraintRows[i].deleteCell(-1);
-            var operatorSelector = constraintRows[i].lastChild.lastChild;
-            var operator = operatorSelector.options[operatorSelector.selectedIndex].value;
-            constraintRows[i].deleteCell(-1);
-
-            // remove the removed variable ;)
-            constraintRows[i].deleteCell(-1);
-
-            // add the right hand side
-            var operatorCell = constraintRows[i].insertCell();
-            operatorCell.appendChild(createOperatorSelectorElement(operator));
-
-            var rightHand = constraintRows[i].insertCell();
-            rightHand.appendChild(createInputElement(valueOfRightHandSide));
-        }
-
-        // bounds
-        bounds.removeChild(bounds.lastElementChild);
     }
 
     return {

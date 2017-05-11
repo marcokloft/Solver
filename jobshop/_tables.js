@@ -1,120 +1,222 @@
-/**
- * Created by Marco on 03.05.2017.
- */
-
 var TableManipulator = (function () {
 
 
-    function createTableauHeader() {
+    /**
+     *
+     * creates initial the <thead> element for the matrix table
+     *
+     * @returns void
+     */
+    function createMatrixHeader() {
         // createTHead() returns the existing <thead> element
-        var header = tableau.createTHead();
+        var header = matrixTable.createTHead();
         var headerRow = header.insertRow();
-        headerRow.id = "tableauHeader";
+        headerRow.id = "matrixHeader";
         headerRow.insertCell(0); // the first cell is empty
 
         for (var i = 0; i < numbOfVariables; i++) {
             var cell = headerRow.insertCell();
             cell.innerHTML = "x<sub>" + (i + 1) + "</sub>";
         }
-        headerRow.insertCell();
         headerRow.insertCell().innerHTML = "b";
     }
 
-    function reset() {
+    /**
+     *
+     * creates initial the row for the objective function for the matrix table
+     *
+     * @returns void
+     */
+    function createObjectiveFunction() {
 
-        numbOfVariables = 2;
-        numbOfConstraints = 2;
-
-        document.getElementById("jobshop.numbOfVariables").value = numbOfVariables;
-        document.getElementById("jobshop.numbOfConstraints").value = numbOfConstraints;
-
-        // remove the content of the thead
-        while (tableau.firstElementChild.hasChildNodes()) {
-            tableau.firstElementChild
-                .removeChild(tableau.firstElementChild.lastChild);
-        }
-        // and the tbody of the tableau
-        while (tableau.lastElementChild.hasChildNodes()) {
-            tableau.lastElementChild
-                .removeChild(tableau.lastElementChild.lastChild);
-        }
-        // call init function
-
-        init();
-    }
-
-    function addConstraint(numb) {
-        var tableauRow = tableau.insertRow();
-        tableauRow.id = "constraint_" + numb;
-        var att = document.createAttribute("class");
-        att.value = "constraint";
-        tableauRow.setAttributeNode(att);
-
-        var lineHeading = tableauRow.insertCell();
-        lineHeading.innerHTML = headerTableauConstraintRow + " " + numb;
+        var objectiveFunction = matrixTable.getElementsByTagName('tbody')[0]
+            .insertRow();
+        objectiveFunction.id = "objectiveFunction";
+        var lineHeading = objectiveFunction.insertCell();
+        lineHeading.innerHTML = headerMatrixObjectiveFunction;
 
         for (var i = 0; i < numbOfVariables; i++) {
-            var tempCell = tableauRow.insertCell();
+            var tempCell = objectiveFunction.insertCell();
             tempCell.appendChild(createInputElement());
         }
-        var operator = tableauRow.insertCell();
-        operator.appendChild(createOperatorSelectorElement());
-        var rightHand = tableauRow.insertCell();
+
+        var rightHand = objectiveFunction.insertCell();
         rightHand.appendChild(createInputElement());
+
     }
 
+    /**
+     * reset the two tables and set the default size of 2 variables & constraints
+     *
+     * @returns
+     */
+    function reset() {
+
+        numbOfVariables = 4;
+        numbOfConstraints = 2;
+
+        document.getElementById("numbOfVariables").value = numbOfVariables;
+        document.getElementById("numbOfConstraints").value = numbOfConstraints;
+
+        // remove the content of the thead
+        while (matrixTable.firstElementChild.hasChildNodes()) {
+            matrixTable.firstElementChild
+                .removeChild(matrixTable.firstElementChild.lastChild);
+        }
+        // and the tbody of the matrixTable
+        while (matrixTable.lastElementChild.hasChildNodes()) {
+            matrixTable.lastElementChild
+                .removeChild(matrixTable.lastElementChild.lastChild);
+        }
+
+        // repeat the steps which are used in the init function
+        // (except of adding the event handlers)
+
+        // create the header element, depending on the amount of variables
+        createMatrixHeader();
+
+        // same for the objective function
+        createObjectiveFunction();
+
+        // create rows for the constraints
+        for (var i = 0; i < numbOfConstraints; i++) {
+            addConstraint(i + 1);
+        }
+
+        // reset the save matrix button
+        savedMatrix = [];
+        // reset the "show all basis solutions" button
+        EventHandler.updateLabelBasisSolutions();
+    }
+
+    /**
+     *
+     * @param numb : number, used for the id of the row
+     * @returns
+     */
+    function addConstraint(numb) {
+
+        // createTBody() returns the existing <tbody> element
+        var tBody = matrixTable.tBodies[0];
+        var objectiveFunction = document.getElementById("objectiveFunction");
+
+
+
+        // insert a new row to the table body
+        var matrixRow = matrixTable.tBodies[0].insertRow();
+        // set the id
+        matrixRow.id = "constraint_" + numb;
+        // set the class
+        matrixRow.setAttribute("class", "constraint");
+
+        // create the line heading
+        var lineHeading = matrixRow.insertCell();
+        lineHeading.innerHTML = headerMatrixConstraintRow + " " + numb;
+
+        // create and insert the new input elements
+        for (var i = 0; i < numbOfVariables; i++) {
+            var tempCell = matrixRow.insertCell();
+            tempCell.appendChild(createInputElement());
+        }
+        // create and insert the rhs
+        var rightHand = matrixRow.insertCell();
+        rightHand.appendChild(createInputElement());
+
+    }
+
+    /**
+     *
+     * @returns
+     */
     function removeConstraint() {
-        // tableau
-        var tableauBody = document.getElementById("tableauBody");
+
+        // get the row collection of all constraints
         var constraintRows = document.getElementsByClassName("constraint");
+        // get the parent of the constraintRows (the tbody element)
+        // and remove the last element
         constraintRows[0].parentNode.removeChild(constraintRows
             .item(constraintRows.length - 1));
     }
 
+    /**
+     *
+     * adds a new variable to the matrix and the bounds table
+     *
+     * @returns
+     */
     function addVariable() {
 
-        // tableau header
-        var headerRow = document.getElementById("tableauHeader");
-        headerRow.deleteCell(-1);
+        // matrix header
+        var headerRow = document.getElementById("matrixHeader");
+
+        var rhsColumn = [];
+        for (var i = 1; i < matrixTable.rows.length; i++) {
+            rhsColumn.push(matrixTable.rows[i].lastElementChild);
+        }
+
+        // delete the rhs label cell in the header row
         headerRow.deleteCell(-1);
 
-        var tmpCell = headerRow.insertCell();
-        tmpCell.innerHTML = "x<sub>" + numbOfVariables + "</sub>";
+        // add the new variable
+        var cell = headerRow.insertCell();
+        cell.innerHTML = "x<sub>" + numbOfVariables + "</sub>";
 
-        headerRow.insertCell();
+        // and add again the label for the rhs
         headerRow.insertCell().innerHTML = "b";
+
+        // objective function
+        var objectiveFunctionRow = document.getElementById("objectiveFunction");
+        objectiveFunctionRow.deleteCell(-1);
+
+        var objFuncCell = objectiveFunctionRow.insertCell();
+        objFuncCell.appendChild(createInputElement());
+
+        var rightHand = objectiveFunctionRow.insertCell();
+        rightHand.appendChild(createInputElement());
 
         // extend constraints row
         var constraintRows = document.getElementsByClassName("constraint");
-        for (var i = 0; i < constraintRows.length; i++) {
+        for (var j = 0; j < constraintRows.length; j++) {
 
             // remove the right hand side
-            constraintRows[i].deleteCell(-1);
-            constraintRows[i].deleteCell(-1);
+            constraintRows[j].deleteCell(-1);
 
             // add the cell for the new variable
-            var newCell = constraintRows[i].insertCell();
+            var newCell = constraintRows[j].insertCell();
             newCell.appendChild(createInputElement());
 
             // add the right hand side
-            var rightHand = constraintRows[i].insertCell();
-            rightHand.appendChild(createInputElement());
+            var rhs = constraintRows[j].insertCell();
+            rhs.appendChild(createInputElement());
         }
 
-        // extend bounds table
-        bounds.appendChild(createNewBoundsRow(numbOfVariables));
+        for (var k = 1; k < matrixTable.rows.length; k++) {
+            matrixTable.rows[k].replaceChild(rhsColumn[k - 1], matrixTable.rows[k].lastElementChild);
+        }
 
     }
 
+    /**
+     *
+     * remove a single variable (with saving the value of the righthandside)
+     *
+     * @returns
+     */
     function removeVariable() {
         // tablaeu header
-        var headerRow = document.getElementById("tableauHeader");
-        headerRow.deleteCell(-1);
-        headerRow.deleteCell(-1); // two times for the "right hand side"
+        var headerRow = document.getElementById("matrixHeader");
+        headerRow.deleteCell(-1); // one time for the "right hand side"
         headerRow.deleteCell(-1); // one time for the deleted variable
 
-        headerRow.insertCell();
         headerRow.insertCell().innerHTML = "b";
+
+        // objective function
+        var objectiveFunctionRow = document.getElementById("objectiveFunction");
+        objectiveFunctionRow.deleteCell(-1);
+        objectiveFunctionRow.deleteCell(-1);
+
+        var rightHand = objectiveFunctionRow.insertCell();
+        rightHand.appendChild(createInputElement());
 
         // constraints
         var constraintRows = document.getElementsByClassName("constraint");
@@ -123,25 +225,22 @@ var TableManipulator = (function () {
             // remove the right hand side
             var valueOfRightHandSide = constraintRows[i].lastChild.lastChild.value;
             constraintRows[i].deleteCell(-1);
-            var operatorSelector = constraintRows[i].lastChild.lastChild;
-            var operator = operatorSelector.options[operatorSelector.selectedIndex].value;
-            constraintRows[i].deleteCell(-1);
 
             // remove the removed variable ;)
             constraintRows[i].deleteCell(-1);
 
             // add the right hand side
-            var operatorCell = constraintRows[i].insertCell();
-            operatorCell.appendChild(createOperatorSelectorElement(operator));
-
-            var rightHand = constraintRows[i].insertCell();
-            rightHand.appendChild(createInputElement(valueOfRightHandSide));
+            var rhs = constraintRows[i].insertCell();
+            rhs.appendChild(createInputElement(valueOfRightHandSide));
         }
-
-        // bounds
-        bounds.removeChild(bounds.lastElementChild);
-
     }
+
+    /**
+     *
+     *
+     * @param value : number, optional! the initial value of the input element
+     * @returns Element
+     */
     function createInputElement(value) {
 
         if (typeof value === 'undefined') {
@@ -149,20 +248,37 @@ var TableManipulator = (function () {
         }
 
         var element = document.createElement("input");
-        element.type = "number";
+        element.addEventListener("keyup", EventHandler.checkUserNumberInput);
+
+        // link to visualize the pattern
+        // https://www.debuggex.com/r/d5NHthVr7PA3mEhE
+
+        element.pattern = "^[-]?[0-9]+((\.|,)[0-9]+)?((\/-?0(\.|,)([1-9]+[0-9]*|[0-9]+[1-9]))|(\/-?[1-9]+((\.|,)[0-9]+)?))?$";
+        element.title = "Geben Sie eine Ganzzahl oder eine gültige rationale Zahl ein.";
+        element.placeholder = "insert number";
+        element.addEventListener("click", function () {
+            this.select();
+        });
         element.value = value;
 
         return element;
     }
 
+
+    /**
+     * make all the functions (in this case all are public) accessible
+     *
+     */
     return {
-        addVariable: addVariable,
-        addConstraint: addConstraint,
-        removeVariable: removeVariable,
-        removeConstraint: removeConstraint,
+        createObjectiveFunction: createObjectiveFunction,
+        createMatrixHeader: createMatrixHeader,
         reset: reset,
-        createTableauHeader: createTableauHeader
+
+        addVariable: addVariable,
+        removeVariable: removeVariable,
+
+        addConstraint: addConstraint,
+        removeConstraint: removeConstraint
     };
 
 })();
-
