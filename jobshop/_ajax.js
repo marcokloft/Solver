@@ -4,6 +4,10 @@
 
 var AjaxHandler = (function () {
 
+    var matrix;
+
+
+
 
     var exampleTask = {
         "meta": {
@@ -46,6 +50,12 @@ var AjaxHandler = (function () {
         }],
         "bounds": []
     };
+
+
+    function createConstraint() {
+
+    }
+
 
     function collectConstraintsData() {
         var tmpArray = [];
