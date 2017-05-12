@@ -6,7 +6,36 @@ var AjaxHandler = (function () {
 
     var matrix;
 
+    /**
+     *
+     * is the same like in the powerlp > ajax.js > collectConstraintsData()
+     * must be called before every operation to get the values from the html
+     * table to the matrix array
+     *
+     * @returns
+     */
+    function getValuesFromTableToMatrix() {
 
+        var rows = matrixTable.rows;
+        var tmpArray = [];
+
+        // start with 1, so we ignore the row in the thead element
+        for (var i = 1; i < rows.length; i++) {
+            var item = rows[i];
+            var constraintCells = item.cells;
+            var tmpConstraint = [];
+
+            // iterate over the cells of the row
+            for (var j = 1; j < (constraintCells.length); j++) {
+                var valueOfCell = constraintCells.item(j).firstElementChild.value;
+                tmpConstraint.push(valueOfCell);
+            }
+
+            tmpArray.push(tmpConstraint);
+        }
+        matrix = tmpArray;
+        console.log(matrix);
+    }
 
 
     var exampleTask = {
@@ -52,10 +81,6 @@ var AjaxHandler = (function () {
     };
 
 
-    function createConstraint() {
-
-    }
-
 
     function collectConstraintsData() {
         var tmpArray = [];
@@ -75,12 +100,13 @@ var AjaxHandler = (function () {
                 tmpConstraint.variables.push(tmpVariable);
             }
 
-            tmpConstraint.type = constraintCells.item(constraintCells.length - 2).firstElementChild.value;
-            tmpConstraint.rhs = constraintCells.item(constraintCells.length - 1).firstElementChild.value;
-            tmpArray.push(tmpConstraint);
         }
         return tmpArray;
     }
+
+     function createConstraint() {
+        matrix[0][0];
+     }
 
     /**
      *
@@ -146,6 +172,7 @@ var AjaxHandler = (function () {
         xhr.send(JSON.stringify(task));
     }
     return {
-        collectTaskData: collectTaskData
+        collectTaskData: collectTaskData,
+        getValuesFromTableToMatrix: getValuesFromTableToMatrix
     };
 })();
