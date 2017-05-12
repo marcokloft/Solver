@@ -4,7 +4,14 @@
 
 var AjaxHandler = (function () {
 
+    //
     var matrix;
+
+    // the amout of the variables (columns)
+    var amountOfVariables;
+
+    // the count variable for creating the constraints
+    var idOfConstraint;
 
     /**
      *
@@ -81,16 +88,18 @@ var AjaxHandler = (function () {
     };
 
 
-
     function collectConstraintsData() {
+
         var tmpArray = [];
-        var constraintRows = document.getElementsByClassName("constraint");
-        for (var i = 0; i < constraintRows.length; i++) {
-            var item = constraintRows[i];
+
+        for (var i = 0; i < matrix.length; i++) {
+            var item = matrix[i];
             var constraintCells = item.cells;
+
             // create a constraint object
             var tmpConstraint = {};
             tmpConstraint.name = "R" + (i + 1);
+
             tmpConstraint.variables = [];
             // iterate over the cells of the row
             for (var j = 1; j < (constraintCells.length - 2); j++) {
@@ -101,12 +110,38 @@ var AjaxHandler = (function () {
             }
 
         }
+
         return tmpArray;
     }
 
-     function createConstraint() {
-        matrix[0][0];
-     }
+    function createConstraint() {
+
+        // the sum of all values of all cells
+        var sumOfAllVariableValues = 0;
+
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+                sumOfAllVariableValues += matrix[i][j];
+            }
+        }
+
+        // calculate the amount of variables
+        amountOfVariables = (sumOfAllVariableValues * (matrix.length + matrix[0].length)) * 2;
+
+    }
+
+
+    /**
+     * RULE 1
+     */
+    function constraintsProcessingTime() {
+        var counter = 0;
+        for (var i = 0; i < amountOfVariables; i++) {
+
+        }
+
+    }
+
 
     /**
      *
@@ -125,21 +160,11 @@ var AjaxHandler = (function () {
         task.objective = {};
         task.objective.type = "min";
         task.objective.variables = [];
-        // collect all data from the target function
-        var targetFunctionRow = document.getElementById("targetFunction");
-        var targetFunctionCells = targetFunctionRow.cells;
-        for (var i = 1; i < (targetFunctionCells.length - 2); i++) {
-            var tmp = {};
-            tmp.name = "x" + (i);
-            tmp.coefficient = targetFunctionCells.item(i).firstElementChild.value;
-            task.objective.variables.push(tmp);
-        }
+
+        // collect all data from the objective function
 
         // collect all data from the constraints
         task.constraints = collectConstraintsData();
-
-        // bounds
-        task.bounds = collectBoundsData();
 
         sendTask(task);
     }
@@ -171,8 +196,10 @@ var AjaxHandler = (function () {
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify(task));
     }
+
     return {
         collectTaskData: collectTaskData,
         getValuesFromTableToMatrix: getValuesFromTableToMatrix
     };
+
 })();
