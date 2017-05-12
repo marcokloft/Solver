@@ -17,7 +17,7 @@ var EventHandler = (function () {
             if (newValue === "") {
                 // nothing to do, waiting for user input
                 // return;
-            } else if (newValue < 1) {
+            } else if (newValue < 2) {
                 // the input is negative, set the old
                 // value
                 document.getElementById("jobshop.numbOfVariables").value = numbOfVariables;
@@ -29,7 +29,7 @@ var EventHandler = (function () {
                 if (diffVariables > 0) {
                     for (var i = 0; i < diffVariables; i++) {
                         numbOfVariables++;
-                        addVariable();
+                        TableManipulator.addVariable();
                     }
                 } else if (diffVariables < 0) {
                     for (var j = diffVariables; j < 0; j++) {
@@ -37,7 +37,7 @@ var EventHandler = (function () {
                             break;
                         }
                         numbOfVariables--;
-                        removeVariable();
+                        TableManipulator.removeVariable();
                     }
                 }
             }
@@ -64,7 +64,7 @@ var EventHandler = (function () {
 
                 // if the value from the user is lower than
                 // 1, insert the previous positive
-                if (newValue < 1) {
+                if (newValue < 2) {
                     document.getElementById("jobshop.numbOfConstraints").value = numbOfConstraints;
                     //return;
                 } else {
@@ -161,7 +161,7 @@ var EventHandler = (function () {
         document.getElementById("jobshop.reset").addEventListener("click", TableManipulator.reset);
 
         // add the event listener for the solve button
-        //document.getElementById("jobshop.solve").addEventListener("click", collectTaskData);
+        document.getElementById("jobshop.solve").addEventListener("click", AjaxHandler.collectTaskData);
 
     }
 

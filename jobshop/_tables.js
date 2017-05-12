@@ -1,6 +1,4 @@
 var TableManipulator = (function () {
-
-
     /**
      *
      * creates initial the <thead> element for the matrix table
@@ -16,11 +14,9 @@ var TableManipulator = (function () {
 
         for (var i = 0; i < numbOfVariables; i++) {
             var cell = headerRow.insertCell();
-            cell.innerHTML = "x<sub>" + (i + 1) + "</sub>";
+            cell.innerHTML = "Maschine " + (i + 1);
         }
     }
-
-
     /**
      * reset the two tables and set the default size of 2 variables & constraints
      *
@@ -28,11 +24,11 @@ var TableManipulator = (function () {
      */
     function reset() {
 
-        numbOfVariables = 4;
+        numbOfVariables = 2;
         numbOfConstraints = 2;
 
-        document.getElementById("numbOfVariables").value = numbOfVariables;
-        document.getElementById("numbOfConstraints").value = numbOfConstraints;
+        document.getElementById("jobshop.numbOfVariables").value = numbOfVariables;
+        document.getElementById("jobshop.numbOfConstraints").value = numbOfConstraints;
 
         // remove the content of the thead
         while (matrixTable.firstElementChild.hasChildNodes()) {
@@ -51,9 +47,6 @@ var TableManipulator = (function () {
         // create the header element, depending on the amount of variables
         createMatrixHeader();
 
-        // same for the objective function
-        createObjectiveFunction();
-
         // create rows for the constraints
         for (var i = 0; i < numbOfConstraints; i++) {
             addConstraint(i + 1);
@@ -62,9 +55,8 @@ var TableManipulator = (function () {
         // reset the save matrix button
         savedMatrix = [];
         // reset the "show all basis solutions" button
-        EventHandler.updateLabelBasisSolutions();
+        //EventHandler.updateLabelBasisSolutions();
     }
-
     /**
      *
      * @param numb : number, used for the id of the row
@@ -93,7 +85,6 @@ var TableManipulator = (function () {
         }
 
     }
-
     /**
      *
      * @returns
@@ -107,7 +98,6 @@ var TableManipulator = (function () {
         constraintRows[0].parentNode.removeChild(constraintRows
             .item(constraintRows.length - 1));
     }
-
     /**
      *
      * adds a new variable to the matrix and the bounds table
@@ -121,7 +111,7 @@ var TableManipulator = (function () {
 
         // add the new variable to the header
         var cell = headerRow.insertCell();
-        cell.innerHTML = "x<sub>" + numbOfVariables + "</sub>";
+        cell.innerHTML = "Maschine " + numbOfVariables
 
         // extend constraints row
         var constraintRows = document.getElementsByClassName("constraint");
@@ -131,13 +121,7 @@ var TableManipulator = (function () {
             var newCell = constraintRows[j].insertCell();
             newCell.appendChild(createInputElement());
         }
-
-        //for (var k = 1; k < matrixTable.rows.length; k++) {
-        //    matrixTable.rows[k].replaceChild(rhsColumn[k - 1], matrixTable.rows[k].lastElementChild);
-        //}
-
     }
-
     /**
      *
      * remove a single variable (with saving the value of the righthandside)
@@ -156,9 +140,7 @@ var TableManipulator = (function () {
             constraintRows[i].deleteCell(-1);
         }
     }
-
     /**
-     *
      *
      * @param value : number, optional! the initial value of the input element
      * @returns Element
@@ -185,8 +167,6 @@ var TableManipulator = (function () {
 
         return element;
     }
-
-
     /**
      * make all the functions (in this case all are public) accessible
      *
@@ -201,5 +181,4 @@ var TableManipulator = (function () {
         addConstraint: addConstraint,
         removeConstraint: removeConstraint
     };
-
 })();
