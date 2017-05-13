@@ -76,7 +76,7 @@ var AjaxHandler = (function () {
             // iterate over the cells of the row
             for (var j = 1; j < (constraintCells.length); j++) {
                 var valueOfCell = constraintCells.item(j).firstElementChild.value;
-                tmpConstraint.push(valueOfCell);
+                tmpConstraint.push(parseInt(valueOfCell));
             }
 
             tmpArray.push(tmpConstraint);
@@ -88,6 +88,13 @@ var AjaxHandler = (function () {
      * Create all Constraints for the 4 Roules of JobShop
      */
     function createConstraint() {
+
+        matrix = [];
+        rhsVariables = [];
+        amountOfVariables = 0;
+        amountOfFields = 0;
+        idOfConstraint = 1;
+        sumOfAllVariableValues = 0;
 
         // the sum of all values of all cells
         getValuesFromTableToMatrix();
@@ -113,20 +120,23 @@ var AjaxHandler = (function () {
         amountOfFields = matrix.length + matrix[0].length;
 
         //Temp Variable for the Constraints
-        var Constraint = [];
+        var Constraint = {};
         var tmpConstraint = [];
+        Constraint.constraints = [];
 
         //Bind the 4 Roules of JonShop
-        console.log("Roules");
+        //Roule1
         tmpConstraint = constraintsProcessingTime();
         for (var i = 0; i < tmpConstraint.length; i++) {
             var tmp = tmpConstraint[i];
             Constraint.constraints.push(tmp);
         }
-        //tmpConstraint.constraints.push(constraintsProcessingTime()); // Roule1
-        //tmpConstraint.constraints.push(r2()); // Roule2
-        //tmpConstraint.constraints.push(r3()); // Roule3
-        //tmpConstraint.constraints.push(r4()); // Roule4
+        //Roule2
+        tmpConstraint = constraintsOneProductPerTime();
+        for (var i = 0; i < tmpConstraint.length; i++) {
+            var tmp = tmpConstraint[i];
+            Constraint.constraints.push(tmp);
+        }
 
         return Constraint;
     }
@@ -136,36 +146,83 @@ var AjaxHandler = (function () {
      * @returns
      */
     function constraintsProcessingTime() {
-        var counter = sumOfAllVariableValues;
+        var lowCounter = 0;
+        var highCounter = sumOfAllVariableValues;
         var tmpConstraint = {};
         var tmpArray = [];
 
         for (var i = 0; i < amountOfFields; i++) {
             tmpConstraint.name = "R" + (idOfConstraint);
             tmpConstraint.type = "G";
+            tmpConstraint.rhs = rhsVariables[i];
+            tmpConstraint.variables = [];
             for (var j = 1; j < (amountOfVariables + 1); j++) {
-                console.log("For"+j);
-                console.log("Amount of Variables"+amountOfVariables);
-                console.log("Counter"+counter);
-                console.log("iD"+idOfConstraint);
-                var tmpVariable = {};
-                if(( j - 1 ) < counter){
+
+                if((j > lowCounter) && (j <= highCounter)){
+                    var tmpVariable = {};
                     tmpVariable.name = "x" + (j);
-                    tmpVariable.coefficient = 1;
+                    tmpVariable.coefficient = "1";
                     tmpConstraint.variables.push(tmpVariable);
                 }
                 else {
+                    var tmpVariable = {};
                     tmpVariable.name = "x" + (j);
-                    tmpVariable.coefficient = 0;
+                    tmpVariable.coefficient = "0";
                     tmpConstraint.variables.push(tmpVariable);
                 }
             }
-            tmpConstraint.rhs = rhsVariables[i];
-            counter = counter + sumOfAllVariableValues;
+            lowCounter = lowCounter + sumOfAllVariableValues;
+            highCounter = highCounter + sumOfAllVariableValues;
             idOfConstraint++;
             tmpArray.push(tmpConstraint);
-            console.log("End"+i);
             console.log(tmpConstraint);
+        }
+        return tmpArray;
+    }
+    /**
+     * RULE 2
+     *
+     * @returns
+     */
+    function constraintsOneProductPerTime() {
+
+        var tmpConstraint = {};
+        var tmpArray = [];
+        var tmpJob = 0;
+        var tmpMachine = 0;
+        //var shift = 0;
+
+        for (var i = 0; i < (matrix[0].length); i++) { // Machines
+            tmpJob = 0;
+            for (var k = 0; k < sumOfAllVariableValues; k++) { //Jobs
+
+                tmpConstraint.name = "R" + (idOfConstraint);
+                tmpConstraint.type = "L";
+                tmpConstraint.rhs = 1;
+                tmpConstraint.variables = [];
+
+                for (var j = 1; j < (amountOfVariables + 1); j++) {
+                    if (true) {
+                        tmpJob++;
+                        var tmpVariable = {};
+                        tmpVariable.name = "x" + (j);
+                        tmpVariable.coefficient = "1";
+                        tmpConstraint.variables.push(tmpVariable);
+                    }
+                    else {
+                        var tmpVariable = {};
+                        tmpVariable.name = "x" + (j);
+                        tmpVariable.coefficient = "0";
+                        tmpConstraint.variables.push(tmpVariable);
+                    }
+                    console.log(tmpVariable.coefficient);
+                }
+                tmpJob++;
+                idOfConstraint++;
+                tmpArray.push(tmpConstraint);
+                console.log(tmpConstraint);
+            }
+            tmpMachine++;
         }
         return tmpArray;
     }
