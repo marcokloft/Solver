@@ -4,47 +4,6 @@
 
 var AjaxHandler = (function () {
 
-    //
-    var matrix;
-
-    // the amout of the variables (columns)
-    var amountOfVariables;
-
-    // the count variable for creating the constraints
-    var idOfConstraint;
-
-    /**
-     *
-     * is the same like in the powerlp > ajax.js > collectConstraintsData()
-     * must be called before every operation to get the values from the html
-     * table to the matrix array
-     *
-     * @returns
-     */
-    function getValuesFromTableToMatrix() {
-
-        var rows = matrixTable.rows;
-        var tmpArray = [];
-
-        // start with 1, so we ignore the row in the thead element
-        for (var i = 1; i < rows.length; i++) {
-            var item = rows[i];
-            var constraintCells = item.cells;
-            var tmpConstraint = [];
-
-            // iterate over the cells of the row
-            for (var j = 1; j < (constraintCells.length); j++) {
-                var valueOfCell = constraintCells.item(j).firstElementChild.value;
-                tmpConstraint.push(valueOfCell);
-            }
-
-            tmpArray.push(tmpConstraint);
-        }
-        matrix = tmpArray;
-        console.log(matrix);
-    }
-
-
     var exampleTask = {
         "meta": {
             "solver": "lp_solve"
@@ -87,64 +46,130 @@ var AjaxHandler = (function () {
         "bounds": []
     };
 
+    //
+    var matrix;
+    var rhsVariables = [];
 
-    function collectConstraintsData() {
+    // the amout of the variables (columns)
+    var amountOfVariables = 0;
 
+    // the number of Fields
+    var amountOfFields = 0;
+
+    // the count variable for creating the constraints
+    var idOfConstraint = 1;
+
+    // the summ of all Variables
+    var sumOfAllVariableValues = 0;
+
+    function getValuesFromTableToMatrix() {
+
+        var rows = matrixTable.rows;
         var tmpArray = [];
 
-        for (var i = 0; i < matrix.length; i++) {
-            var item = matrix[i];
+        // start with 1, so we ignore the row in the thead element
+        for (var i = 1; i < rows.length; i++) {
+            var item = rows[i];
             var constraintCells = item.cells;
+            var tmpConstraint = [];
 
-            // create a constraint object
-            var tmpConstraint = {};
-            tmpConstraint.name = "R" + (i + 1);
-
-            tmpConstraint.variables = [];
             // iterate over the cells of the row
-            for (var j = 1; j < (constraintCells.length - 2); j++) {
-                var tmpVariable = {};
-                tmpVariable.name = "x" + (j);
-                tmpVariable.coefficient = constraintCells.item(j).firstElementChild.value;
-                tmpConstraint.variables.push(tmpVariable);
+            for (var j = 1; j < (constraintCells.length); j++) {
+                var valueOfCell = constraintCells.item(j).firstElementChild.value;
+                tmpConstraint.push(valueOfCell);
             }
 
+            tmpArray.push(tmpConstraint);
         }
-
-        return tmpArray;
+        matrix = tmpArray;
+        console.log(matrix);
     }
-
+    /**
+     * Create all Constraints for the 4 Roules of JobShop
+     */
     function createConstraint() {
 
         // the sum of all values of all cells
-        var sumOfAllVariableValues = 0;
+        getValuesFromTableToMatrix();
 
+        // Sum of all Variables
         for (var i = 0; i < matrix.length; i++) {
             for (var j = 0; j < matrix[i].length; j++) {
                 sumOfAllVariableValues += matrix[i][j];
             }
         }
 
+        // Get a 1*X Array for the Variables
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+                rhsVariables.push(matrix[i][j]);
+            }
+        }
+
         // calculate the amount of variables
         amountOfVariables = (sumOfAllVariableValues * (matrix.length + matrix[0].length)) * 2;
 
+        //calculate the amount of fields
+        amountOfFields = matrix.length + matrix[0].length;
+
+        //Temp Variable for the Constraints
+        var Constraint = [];
+        var tmpConstraint = [];
+
+        //Bind the 4 Roules of JonShop
+        console.log("Roules");
+        tmpConstraint = constraintsProcessingTime();
+        for (var i = 0; i < tmpConstraint.length; i++) {
+            var tmp = tmpConstraint[i];
+            Constraint.constraints.push(tmp);
+        }
+        //tmpConstraint.constraints.push(constraintsProcessingTime()); // Roule1
+        //tmpConstraint.constraints.push(r2()); // Roule2
+        //tmpConstraint.constraints.push(r3()); // Roule3
+        //tmpConstraint.constraints.push(r4()); // Roule4
+
+        return Constraint;
     }
-
-
     /**
      * RULE 1
+     *
+     * @returns
      */
     function constraintsProcessingTime() {
-        var counter = 0;
-        for (var i = 0; i < amountOfVariables; i++) {
+        var counter = sumOfAllVariableValues;
+        var tmpConstraint = {};
+        var tmpArray = [];
 
+        for (var i = 0; i < amountOfFields; i++) {
+            tmpConstraint.name = "R" + (idOfConstraint);
+            tmpConstraint.type = "G";
+            for (var j = 1; j < (amountOfVariables + 1); j++) {
+                console.log("For"+j);
+                console.log("Amount of Variables"+amountOfVariables);
+                console.log("Counter"+counter);
+                console.log("iD"+idOfConstraint);
+                var tmpVariable = {};
+                if(( j - 1 ) < counter){
+                    tmpVariable.name = "x" + (j);
+                    tmpVariable.coefficient = 1;
+                    tmpConstraint.variables.push(tmpVariable);
+                }
+                else {
+                    tmpVariable.name = "x" + (j);
+                    tmpVariable.coefficient = 0;
+                    tmpConstraint.variables.push(tmpVariable);
+                }
+            }
+            tmpConstraint.rhs = rhsVariables[i];
+            counter = counter + sumOfAllVariableValues;
+            idOfConstraint++;
+            tmpArray.push(tmpConstraint);
+            console.log("End"+i);
+            console.log(tmpConstraint);
         }
-
+        return tmpArray;
     }
-
-
     /**
-     *
      * @returns
      */
     function collectTaskData() {
@@ -164,11 +189,10 @@ var AjaxHandler = (function () {
         // collect all data from the objective function
 
         // collect all data from the constraints
-        task.constraints = collectConstraintsData();
+        task.constraints = createConstraint();
 
         sendTask(task);
     }
-
     /**
      *
      * @param task:
@@ -198,6 +222,7 @@ var AjaxHandler = (function () {
     }
 
     return {
+        createConstraint: createConstraint,
         collectTaskData: collectTaskData,
         getValuesFromTableToMatrix: getValuesFromTableToMatrix
     };

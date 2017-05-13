@@ -161,7 +161,7 @@ var EventHandler = (function () {
         document.getElementById("jobshop.reset").addEventListener("click", TableManipulator.reset);
 
         // add the event listener for the solve button
-        document.getElementById("jobshop.solve").addEventListener("click", AjaxHandler.getValuesFromTableToMatrix);
+        document.getElementById("jobshop.solve").addEventListener("click", AjaxHandler.createConstraint);
 
     }
 
