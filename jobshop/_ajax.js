@@ -82,42 +82,11 @@ var AjaxHandler = (function () {
             tmpArray.push(tmpConstraint);
         }
         matrix = tmpArray;
-        console.log(matrix);
     }
     /**
      * Create all Constraints for the 4 Roules of JobShop
      */
     function createConstraint() {
-
-        matrix = [];
-        rhsVariables = [];
-        amountOfVariables = 0;
-        amountOfFields = 0;
-        idOfConstraint = 1;
-        sumOfAllVariableValues = 0;
-
-        // the sum of all values of all cells
-        getValuesFromTableToMatrix();
-
-        // Sum of all Variables
-        for (var i = 0; i < matrix.length; i++) {
-            for (var j = 0; j < matrix[i].length; j++) {
-                sumOfAllVariableValues += matrix[i][j];
-            }
-        }
-
-        // Get a 1*X Array for the Variables
-        for (var i = 0; i < matrix.length; i++) {
-            for (var j = 0; j < matrix[i].length; j++) {
-                rhsVariables.push(matrix[i][j]);
-            }
-        }
-
-        // calculate the amount of variables
-        amountOfVariables = (sumOfAllVariableValues * (matrix.length + matrix[0].length)) * 2;
-
-        //calculate the amount of fields
-        amountOfFields = matrix.length * matrix[0].length;
 
         //Temp Variable for the Constraints
         var Constraint = {};
@@ -188,7 +157,6 @@ var AjaxHandler = (function () {
             highCounter = highCounter + sumOfAllVariableValues;
             idOfConstraint++;
             tmpArray.push(tmpConstraint);
-            console.log(tmpConstraint);
         }
         return tmpArray;
     }
@@ -236,7 +204,6 @@ var AjaxHandler = (function () {
                 idOfConstraint++;
                 tmpJob=1;
                 tmpArray.push(tmpConstraint);
-                console.log(tmpConstraint);
             }
         }
         return tmpArray;
@@ -253,11 +220,8 @@ var AjaxHandler = (function () {
         var rShift = 1;
         var tmpMachine = 1;
 
-        for (var i = 0; i < (sumOfAllVariableValues*2); i++) {
-            console.log("rShift"+rShift);
-            console.log("matrix[0].length"+matrix[0].length);
-            console.log("amountOfVariables"+amountOfVariables);
-            console.log("tmpMachine"+tmpMachine);
+        for (var i = 0; i < (sumOfAllVariableValues*matrix.length); i++) {
+
             tmpConstraint.name = "R" + (idOfConstraint);
             tmpConstraint.type = "L";
             tmpConstraint.rhs = 1;
@@ -280,13 +244,11 @@ var AjaxHandler = (function () {
                     tmpVariable.coefficient = "0";
                     tmpConstraint.variables.push(tmpVariable);
                 }
-                console.log(tmpVariable.coefficient);
             }
             tmpMachine = 1;
             rShift = i+2;
             idOfConstraint++;
             tmpArray.push(tmpConstraint);
-            console.log(tmpConstraint);
         }
         return tmpArray;
     }
@@ -299,43 +261,47 @@ var AjaxHandler = (function () {
 
         var tmpConstraint = {};
         var tmpArray = [];
-        var tmpJob = 1;
         var rShift = 1;
+        var rightSide = (amountOfVariables/2)+1;
+        var maxVar = 0;
 
-        for (var i = 0; i < (matrix[0].length); i++) { // Machines
+        for (var i = 0; i < amountOfFields; i++) { // Machines
             for (var k = 0; k < sumOfAllVariableValues; k++) { //Jobs
-                if(k>0){
-                    rShift = rShift - sumOfAllVariableValues*(matrix.length-1);
-                }
                 tmpConstraint.name = "R" + (idOfConstraint);
-                tmpConstraint.type = "L";
-                tmpConstraint.rhs = 1;
+                tmpConstraint.type = "G";
+                tmpConstraint.rhs = 0;
                 tmpConstraint.variables = [];
 
                 for (var j = 1; j < (amountOfVariables + 1); j++) {
-                    if (rShift == j) {
+                    if (rShift == j && maxVar < 2) {
                         var tmpVariable = {};
                         tmpVariable.name = "x" + (j);
                         tmpVariable.coefficient = "1";
                         tmpConstraint.variables.push(tmpVariable);
-                        if(matrix.length > tmpJob){
-                            rShift = rShift + sumOfAllVariableValues;
+                        rShift++;
+                        maxVar++;
+                        if ((k + 1) == sumOfAllVariableValues) {
+                            rShift--;
                         }
-                        tmpJob++;
-                    }
-                    else {
+                    } else if (rightSide == j){
+                        var tmpVariable = {};
+                        tmpVariable.name = "x" + (j);
+                        tmpVariable.coefficient = "-2";
+                        tmpConstraint.variables.push(tmpVariable);
+                    } else {
                         var tmpVariable = {};
                         tmpVariable.name = "x" + (j);
                         tmpVariable.coefficient = "0";
                         tmpConstraint.variables.push(tmpVariable);
                     }
                 }
-                rShift++;
+                rightSide++;
+                rShift--;
+                maxVar=0;
                 idOfConstraint++;
-                tmpJob=1;
                 tmpArray.push(tmpConstraint);
-                console.log(tmpConstraint);
             }
+            rShift=((i+1)*sumOfAllVariableValues)+1;
         }
         return tmpArray;
     }
@@ -343,6 +309,37 @@ var AjaxHandler = (function () {
      * @returns
      */
     function collectTaskData() {
+
+        //Resett all Variables
+        matrix = [];
+        rhsVariables = [];
+        amountOfVariables = 0;
+        amountOfFields = 0;
+        idOfConstraint = 1;
+        sumOfAllVariableValues = 0;
+
+        // the sum of all values of all cells
+        getValuesFromTableToMatrix();
+
+        // Sum of all Variables
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+                sumOfAllVariableValues += matrix[i][j];
+            }
+        }
+
+        // Get a 1*X Array for the Variables
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+                rhsVariables.push(matrix[i][j]);
+            }
+        }
+
+        // calculate the amount of variables
+        amountOfVariables = (sumOfAllVariableValues * (matrix.length * matrix[0].length)) * 2;
+
+        //calculate the amount of fields
+        amountOfFields = matrix.length * matrix[0].length;
 
         // create task object
         var task = {};
@@ -356,12 +353,29 @@ var AjaxHandler = (function () {
         task.objective.type = "min";
         task.objective.variables = [];
 
-        // collect all data from the objective function
+        // fill the Objective Funktion
+        var count = 1;
+        for (var i = 1; i <= (amountOfFields * 2); i++){
+            for ( var j = 1; j <= sumOfAllVariableValues; j++){
+                if(i<=amountOfFields){
+                    var tmpVariable = {};
+                    tmpVariable.name = "x" + (count);
+                    tmpVariable.coefficient = j*5;
+                    task.objective.variables.push(tmpVariable);
+                } else {
+                    var tmpVariable = {};
+                    tmpVariable.name = "x" + (count);
+                    tmpVariable.coefficient = "-1";
+                    task.objective.variables.push(tmpVariable);
+                }
+                count++;
+            }
+        }
 
         // collect all data from the constraints
         task.constraints = createConstraint();
 
-        sendTask(task);
+        //sendTask(task);
     }
     /**
      *
