@@ -117,7 +117,7 @@ var AjaxHandler = (function () {
         amountOfVariables = (sumOfAllVariableValues * (matrix.length + matrix[0].length)) * 2;
 
         //calculate the amount of fields
-        amountOfFields = matrix.length + matrix[0].length;
+        amountOfFields = matrix.length * matrix[0].length;
 
         //Temp Variable for the Constraints
         var Constraint = {};
@@ -137,6 +137,19 @@ var AjaxHandler = (function () {
             var tmp = tmpConstraint[i];
             Constraint.constraints.push(tmp);
         }
+        //Roule3
+        tmpConstraint = constraintsOneProductPerMachine();
+        for (var i = 0; i < tmpConstraint.length; i++) {
+            var tmp = tmpConstraint[i];
+            Constraint.constraints.push(tmp);
+        }
+        //Roule4
+        tmpConstraint = constraintsOneProductWithoutInterruption();
+        for (var i = 0; i < tmpConstraint.length; i++) {
+            var tmp = tmpConstraint[i];
+            Constraint.constraints.push(tmp);
+        }
+
 
         return Constraint;
     }
@@ -188,26 +201,29 @@ var AjaxHandler = (function () {
 
         var tmpConstraint = {};
         var tmpArray = [];
-        var tmpJob = 0;
-        var tmpMachine = 0;
-        //var shift = 0;
+        var tmpJob = 1;
+        var rShift = 1;
 
         for (var i = 0; i < (matrix[0].length); i++) { // Machines
-            tmpJob = 0;
             for (var k = 0; k < sumOfAllVariableValues; k++) { //Jobs
-
+                if(k>0){
+                    rShift = rShift - sumOfAllVariableValues*(matrix.length-1);
+                }
                 tmpConstraint.name = "R" + (idOfConstraint);
                 tmpConstraint.type = "L";
                 tmpConstraint.rhs = 1;
                 tmpConstraint.variables = [];
 
                 for (var j = 1; j < (amountOfVariables + 1); j++) {
-                    if (true) {
-                        tmpJob++;
+                    if (rShift == j) {
                         var tmpVariable = {};
                         tmpVariable.name = "x" + (j);
                         tmpVariable.coefficient = "1";
                         tmpConstraint.variables.push(tmpVariable);
+                        if(matrix.length > tmpJob){
+                            rShift = rShift + sumOfAllVariableValues;
+                        }
+                        tmpJob++;
                     }
                     else {
                         var tmpVariable = {};
@@ -215,14 +231,111 @@ var AjaxHandler = (function () {
                         tmpVariable.coefficient = "0";
                         tmpConstraint.variables.push(tmpVariable);
                     }
-                    console.log(tmpVariable.coefficient);
                 }
-                tmpJob++;
+                rShift++;
                 idOfConstraint++;
+                tmpJob=1;
                 tmpArray.push(tmpConstraint);
                 console.log(tmpConstraint);
             }
-            tmpMachine++;
+        }
+        return tmpArray;
+    }
+    /**
+     * RULE 3
+     *
+     * @returns
+     */
+    function constraintsOneProductPerMachine() {
+
+        var tmpConstraint = {};
+        var tmpArray = [];
+        var rShift = 1;
+        var tmpMachine = 1;
+
+        for (var i = 0; i < (sumOfAllVariableValues*2); i++) {
+            console.log("rShift"+rShift);
+            console.log("matrix[0].length"+matrix[0].length);
+            console.log("amountOfVariables"+amountOfVariables);
+            console.log("tmpMachine"+tmpMachine);
+            tmpConstraint.name = "R" + (idOfConstraint);
+            tmpConstraint.type = "L";
+            tmpConstraint.rhs = 1;
+            tmpConstraint.variables = [];
+            for (var j = 1; j < (amountOfVariables + 1); j++) {
+
+                if((rShift == j)){
+                    var tmpVariable = {};
+                    tmpVariable.name = "x" + (j);
+                    tmpVariable.coefficient = "1";
+                    tmpConstraint.variables.push(tmpVariable);
+                    if(matrix[0].length > tmpMachine) {
+                        rShift = rShift + sumOfAllVariableValues * 2;
+                    }
+                    tmpMachine++
+                }
+                else {
+                    var tmpVariable = {};
+                    tmpVariable.name = "x" + (j);
+                    tmpVariable.coefficient = "0";
+                    tmpConstraint.variables.push(tmpVariable);
+                }
+                console.log(tmpVariable.coefficient);
+            }
+            tmpMachine = 1;
+            rShift = i+2;
+            idOfConstraint++;
+            tmpArray.push(tmpConstraint);
+            console.log(tmpConstraint);
+        }
+        return tmpArray;
+    }
+    /**
+     * RULE 4
+     *
+     * @returns
+     */
+    function constraintsOneProductWithoutInterruption() {
+
+        var tmpConstraint = {};
+        var tmpArray = [];
+        var tmpJob = 1;
+        var rShift = 1;
+
+        for (var i = 0; i < (matrix[0].length); i++) { // Machines
+            for (var k = 0; k < sumOfAllVariableValues; k++) { //Jobs
+                if(k>0){
+                    rShift = rShift - sumOfAllVariableValues*(matrix.length-1);
+                }
+                tmpConstraint.name = "R" + (idOfConstraint);
+                tmpConstraint.type = "L";
+                tmpConstraint.rhs = 1;
+                tmpConstraint.variables = [];
+
+                for (var j = 1; j < (amountOfVariables + 1); j++) {
+                    if (rShift == j) {
+                        var tmpVariable = {};
+                        tmpVariable.name = "x" + (j);
+                        tmpVariable.coefficient = "1";
+                        tmpConstraint.variables.push(tmpVariable);
+                        if(matrix.length > tmpJob){
+                            rShift = rShift + sumOfAllVariableValues;
+                        }
+                        tmpJob++;
+                    }
+                    else {
+                        var tmpVariable = {};
+                        tmpVariable.name = "x" + (j);
+                        tmpVariable.coefficient = "0";
+                        tmpConstraint.variables.push(tmpVariable);
+                    }
+                }
+                rShift++;
+                idOfConstraint++;
+                tmpJob=1;
+                tmpArray.push(tmpConstraint);
+                console.log(tmpConstraint);
+            }
         }
         return tmpArray;
     }
