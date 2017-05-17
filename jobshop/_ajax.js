@@ -375,7 +375,7 @@ var AjaxHandler = (function () {
         // collect all data from the constraints
         task.constraints = createConstraint();
 
-        //sendTask(task);
+        sendTask(task);
     }
     /**
      *
@@ -406,9 +406,7 @@ var AjaxHandler = (function () {
     }
 
     return {
-        createConstraint: createConstraint,
-        collectTaskData: collectTaskData,
-        getValuesFromTableToMatrix: getValuesFromTableToMatrix
+        collectTaskData: collectTaskData
     };
 
 })();
