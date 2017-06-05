@@ -90,35 +90,35 @@ var AjaxHandler = (function () {
 
         //Temp Variable for the Constraints
         var Constraint = {};
-        var tmpConstraint = [];
+        var tmpConstraint = {};
+        tmpConstraint.constraints = [];
         Constraint.constraints = [];
 
         //Bind the 4 Roules of JonShop
         //Roule1
-        tmpConstraint = constraintsProcessingTime();
+        tmpConstraint.constraints = constraintsProcessingTime();
         for (var i = 0; i < tmpConstraint.length; i++) {
-            var tmp = tmpConstraint[i];
-            Constraint.constraints.push(tmp);
+            var tmp1 = tmpConstraint.constraints[i];
+            Constraint.constraints.push(tmp1);
         }
         //Roule2
-        tmpConstraint = constraintsOneProductPerTime();
+        tmpConstraint.constraints = constraintsOneProductPerTime();
         for (var i = 0; i < tmpConstraint.length; i++) {
-            var tmp = tmpConstraint[i];
-            Constraint.constraints.push(tmp);
+            var tmp2 = tmpConstraint.constraints[i];
+            Constraint.constraints.push(tmp2);
         }
         //Roule3
-        tmpConstraint = constraintsOneProductPerMachine();
+        tmpConstraint.constraints = constraintsOneProductPerMachine();
         for (var i = 0; i < tmpConstraint.length; i++) {
-            var tmp = tmpConstraint[i];
-            Constraint.constraints.push(tmp);
+            var tmp3 = tmpConstraint.constraints[i];
+            Constraint.constraints.push(tmp3);
         }
         //Roule4
-        tmpConstraint = constraintsOneProductWithoutInterruption();
+        tmpConstraint.constraints = constraintsOneProductWithoutInterruption();
         for (var i = 0; i < tmpConstraint.length; i++) {
-            var tmp = tmpConstraint[i];
-            Constraint.constraints.push(tmp);
+            var tmp4 = tmpConstraint.constraints[i];
+            Constraint.constraints.push(tmp4);
         }
-
 
         return Constraint;
     }
@@ -158,6 +158,7 @@ var AjaxHandler = (function () {
             idOfConstraint++;
             tmpArray.push(tmpConstraint);
         }
+        console.log(tmpArray);
         return tmpArray;
     }
     /**
@@ -373,7 +374,16 @@ var AjaxHandler = (function () {
         }
 
         // collect all data from the constraints
-        task.constraints = createConstraint();
+
+        var tmpCnst = createConstraint();
+
+        console.log(tmpCnst);
+
+        for (var i = 0; i < tmpCnst.constraints.length; i++) {
+            var tmp = tmpCnst.constraints[i];
+            task.constraints.push(tmp);
+        }
+        //task.constraints = createConstraint();
 
         sendTask(task);
     }
