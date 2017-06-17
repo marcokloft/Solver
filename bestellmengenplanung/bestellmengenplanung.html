@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="bestellmengenplanung.js"></script>
+    <script src="_tables.js"></script>
+    <script src="_eventhandler.js"></script>
+    <script src="_ajax.js"></script>
+</head>
+<body>
+
+<section id="controls">
+    <label for="bmp.numbOfPeriods" th:text="#{bmp_numbOfPeriods}">Anzahl der Perioden</label>
+    <input id="bmp.numbOfPeriods" name="bmp.numbOfPeriods" type="number" min="1" placeholder="Number of Periods" value="2"/>
+
+    <button id="bmp.incrementNumberOfPeriods">↑</button>
+    <button id="bmp.decrementNumberOfPeriods">↓</button>
+
+    <button id="bmp.reset" th:text="#{bmp.resetButton}">Reset</button>
+    <button id="bmp.solve" th:text="#{bmp.solveButton}">Lösen</button>
+    <button id="bmp.loadExample" th:text="#{bmp.loadExampleButton}">Beispiel-Aufgabe laden</button>
+    <button id="bmp.export">Export</button>
+    <input type="file" id="import" accept="text/plain" style="display:none" onchange="Util.sendFileToImport(this.files)">
+    <label for="bmp.showLastColumn">Fehlmengenkosten ?</label>
+    <input type="Checkbox" id="bmp.showLastColumn">
+</section>
+
+<div id="table">
+    <form id="matrixForm" onsubmit="return false">
+        <table id="matrix">
+            <thead>
+
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <input type="submit" id="submitButton" style="display: none"/>
+
+    </form>
+</div>
+
+<div id="response">
+</div>
+
+<script th:inline="javascript">
+
+    // the strings to translate
+    var headerMatrixConstraintRow = "Periode";
+    init();
+</script>
+</body>
+</html>
