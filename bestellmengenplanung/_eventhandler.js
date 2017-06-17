@@ -85,8 +85,10 @@ var EventHandler = (function () {
                 });
         document.getElementById("bmp.showLastColumn").addEventListener("click", function(e) {
             if (e.target.checked) {
+                stateLastColumn = true;
                 TableManipulator.enableLastColumn();
             } else {
+                stateLastColumn = false;
                 TableManipulator.disableLastColumn();
             }
         });

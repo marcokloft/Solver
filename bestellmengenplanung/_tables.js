@@ -37,6 +37,10 @@ var TableManipulator = (function () {
 
         numbOfConstraints = 2;
 
+        stateLastColumn =false;
+
+        document.getElementById("bmp.showLastColumn").checked = false;
+
         document.getElementById("bmp.numbOfPeriods").value = numbOfConstraints;
 
         // remove the content of the thead
@@ -95,6 +99,11 @@ var TableManipulator = (function () {
         for (var i = 0; i < 4; i++) {
             var tempCell = matrixRow.insertCell();
             tempCell.appendChild(createInputElement());
+        }
+        if(stateLastColumn){
+            TableManipulator.enableLastColumn();
+        }else{
+            TableManipulator.disableLastColumn();
         }
     }
 
@@ -156,7 +165,7 @@ var TableManipulator = (function () {
     function enableLastColumn() {
         var tmpTable = matrixTable.getElementsByClassName("constraint");
         for (var i = 0; i < matrixTable.getElementsByClassName("constraint").length; i++) {
-            tmpTable.item(i).lastChild.firstChild.setAttribute("disabled", "false");
+            tmpTable.item(i).lastChild.firstChild.removeAttribute("disabled");
         }
     }
 

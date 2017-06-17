@@ -7,6 +7,8 @@ var matrixTable;
 // number: the current amount of constraints (=rows)
 var numbOfConstraints;
 
+var stateLastColumn =false;
+
 
 function init() {
     matrixTable = document.getElementById("matrix");
@@ -15,6 +17,7 @@ function init() {
     EventHandler.initEventHandler();
 
     TableManipulator.createMatrixHeader();
+
 
     // create rows for the constraints
     for (var i = 0; i < numbOfConstraints; i++) {
@@ -35,7 +38,9 @@ function loadExample() {
     // row[0] is the header
     rows[1].childNodes[1].firstElementChild.value = 1;
     rows[1].childNodes[2].firstElementChild.value = 1;
+    rows[1].childNodes[3].firstElementChild.value = 1;
 
     rows[2].childNodes[1].firstElementChild.value = 2;
     rows[2].childNodes[2].firstElementChild.value = 1;
+    rows[2].childNodes[3].firstElementChild.value = 1;
 }
